@@ -1,0 +1,491 @@
+window.CAMP_SCENE = {
+  "schemaVersion": 1,
+  "name": "月下营地 · 分层素材试导出",
+  "logicalSize": [
+    500,
+    300
+  ],
+  "sourceConcept": "../../../output/imagegen/14-moonlit-valley-depth-fog.png",
+  "reconstructed": true,
+  "notes": [
+    "Static layers are AI-reconstructed from a flattened concept, not lossless original project layers.",
+    "All static PNGs retain large transparent margins; sourceRect and drawRect trim them at rendering time.",
+    "Toolbar was separately extracted and placed using its drawRect.",
+    "Background fog is baked into the individual depth layers; it is not a separate adjustable fog mask.",
+    "Fire animation references the existing licensed author files; no AI-generated flame is used."
+  ],
+  "backgroundComposition": {
+    "maskedLayers": [
+      "sky",
+      "far",
+      "middle"
+    ],
+    "alphaMask": "sky",
+    "unmaskedFrontLayer": "near",
+    "description": "Composite distant scenery into the sky cutout with destination-in, then draw near silhouettes over it."
+  },
+  "layers": [
+    {
+      "id": "sky",
+      "label": "天空、月亮与星星",
+      "file": "background/00-sky-moon-stars.png",
+      "z": 0,
+      "category": "background",
+      "sourceRect": [
+        34,
+        108,
+        1557,
+        615
+      ],
+      "drawRect": [
+        10.5,
+        33.368,
+        480.852,
+        190.01
+      ],
+      "defaultVisible": true,
+      "interactive": false,
+      "metadata": {
+        "width": 1619,
+        "height": 971,
+        "bytes": 1011072,
+        "sha256": "95d157b283114f85eaae1b83af64f4b807ad3c0b0e3c023ad4cffa7c43569b81",
+        "alphaBounds": [
+          34,
+          108,
+          1557,
+          615
+        ],
+        "fullyTransparentFraction": 0.5162650782513777,
+        "partialAlphaFraction": 0.48272986401823353,
+        "visiblePixels": 723102
+      }
+    },
+    {
+      "id": "far",
+      "label": "远山与浓雾",
+      "file": "background/01-far-mountains-mist.png",
+      "z": 10,
+      "category": "background",
+      "sourceRect": [
+        42,
+        316,
+        1539,
+        414
+      ],
+      "drawRect": [
+        12.963,
+        97.631,
+        475,
+        127.909
+      ],
+      "defaultVisible": true,
+      "interactive": false,
+      "metadata": {
+        "width": 1620,
+        "height": 971,
+        "bytes": 696691,
+        "sha256": "edd0c05e7fbba4db5c6a0b7eb5d37ce7bdafdd5dd9c3fca07afba60be3881c78",
+        "alphaBounds": [
+          42,
+          316,
+          1539,
+          414
+        ],
+        "fullyTransparentFraction": 0.6668103393472429,
+        "partialAlphaFraction": 0.33299449466631065,
+        "visiblePixels": 513655
+      }
+    },
+    {
+      "id": "middle",
+      "label": "中景山林与薄雾",
+      "file": "background/02-mid-forest-mist.png",
+      "z": 20,
+      "category": "background",
+      "sourceRect": [
+        38,
+        432,
+        1550,
+        280
+      ],
+      "drawRect": [
+        11.736,
+        133.471,
+        478.691,
+        86.509
+      ],
+      "defaultVisible": true,
+      "interactive": false,
+      "metadata": {
+        "width": 1619,
+        "height": 971,
+        "bytes": 431283,
+        "sha256": "c329f92c31820436045104dcf855ebe08e9c1aaf48ec51678807b77bbe313ec3",
+        "alphaBounds": [
+          38,
+          432,
+          1550,
+          280
+        ],
+        "fullyTransparentFraction": 0.8146234627546597,
+        "partialAlphaFraction": 0.18513481450005692,
+        "visiblePixels": 270743
+      }
+    },
+    {
+      "id": "near",
+      "label": "近景山坡与清晰松树",
+      "file": "background/03-near-hills-pines.png",
+      "z": 30,
+      "category": "background",
+      "sourceRect": [
+        24,
+        238,
+        1573,
+        488
+      ],
+      "drawRect": [
+        7.407,
+        73.532,
+        485.494,
+        150.772
+      ],
+      "defaultVisible": true,
+      "interactive": false,
+      "metadata": {
+        "width": 1620,
+        "height": 971,
+        "bytes": 520022,
+        "sha256": "aa4f132a16943f4f3ac085736beb37ca112dee6a542b6b8aa7647bd3e9b10c23",
+        "alphaBounds": [
+          24,
+          238,
+          1573,
+          488
+        ],
+        "fullyTransparentFraction": 0.7592598949790849,
+        "partialAlphaFraction": 0.23965365983903575,
+        "visiblePixels": 354120
+      }
+    },
+    {
+      "id": "ground",
+      "label": "草地与前景碎石",
+      "file": "terrain/ground-grass-stones.png",
+      "z": 40,
+      "category": "terrain",
+      "sourceRect": [
+        19,
+        672,
+        1583,
+        89
+      ],
+      "drawRect": [
+        5.868,
+        207.407,
+        488.882,
+        27.469
+      ],
+      "defaultVisible": true,
+      "interactive": false,
+      "metadata": {
+        "width": 1619,
+        "height": 972,
+        "bytes": 238126,
+        "sha256": "fc2fe86e206d393909b03aa0a9a8b4145c2597d84ba6ae1c9f81e4fe8f4e89bc",
+        "alphaBounds": [
+          19,
+          672,
+          1583,
+          89
+        ],
+        "fullyTransparentFraction": 0.9401271424468185,
+        "partialAlphaFraction": 0.05922786763154617,
+        "visiblePixels": 78094
+      }
+    },
+    {
+      "id": "tent",
+      "label": "帐篷与铺盖卷",
+      "file": "props/tent-bedroll.png",
+      "z": 50,
+      "category": "props",
+      "sourceRect": [
+        71,
+        338,
+        433,
+        383
+      ],
+      "drawRect": [
+        21.927,
+        104.428,
+        133.725,
+        118.332
+      ],
+      "defaultVisible": true,
+      "interactive": true,
+      "metadata": {
+        "width": 1619,
+        "height": 971,
+        "bytes": 230424,
+        "sha256": "7268e3e670837194011221d62990704dd62a1027e5afe80132a0e00254c96a84",
+        "alphaBounds": [
+          71,
+          338,
+          433,
+          383
+        ],
+        "fullyTransparentFraction": 0.941138603186033,
+        "partialAlphaFraction": 0.05881114392744755,
+        "visiblePixels": 87480
+      }
+    },
+    {
+      "id": "kettle",
+      "label": "烧水壶",
+      "file": "props/kettle.png",
+      "z": 51,
+      "category": "props",
+      "sourceRect": [
+        643,
+        590,
+        131,
+        122
+      ],
+      "drawRect": [
+        198.579,
+        182.286,
+        40.457,
+        37.693
+      ],
+      "defaultVisible": true,
+      "interactive": true,
+      "metadata": {
+        "width": 1619,
+        "height": 971,
+        "bytes": 83561,
+        "sha256": "963d4638942cd669bde5b5675a81e0333f8109b168530cad9aab266a667ba168",
+        "alphaBounds": [
+          643,
+          590,
+          131,
+          122
+        ],
+        "fullyTransparentFraction": 0.9915880484641382,
+        "partialAlphaFraction": 0.00838650703635828,
+        "visiblePixels": 10927
+      }
+    },
+    {
+      "id": "woodpile",
+      "label": "无绳木堆",
+      "file": "props/woodpile.png",
+      "z": 52,
+      "category": "props",
+      "sourceRect": [
+        1325,
+        593,
+        203,
+        121
+      ],
+      "drawRect": [
+        409.203,
+        183.213,
+        62.693,
+        37.384
+      ],
+      "defaultVisible": true,
+      "interactive": true,
+      "metadata": {
+        "width": 1619,
+        "height": 971,
+        "bytes": 92660,
+        "sha256": "ffa808bf5d5e2830862f240f32f9e480eec60089947cc83fe725a4350dbd6a8d",
+        "alphaBounds": [
+          1325,
+          593,
+          203,
+          121
+        ],
+        "fullyTransparentFraction": 0.9865055096883112,
+        "partialAlphaFraction": 0.013427698500492033,
+        "visiblePixels": 19542
+      }
+    },
+    {
+      "id": "fire-base",
+      "label": "火堆底座、石块与燃木",
+      "file": "props/fire-base-stones-logs.png",
+      "z": 60,
+      "category": "props",
+      "sourceRect": [
+        817,
+        582,
+        247,
+        135
+      ],
+      "drawRect": [
+        252.316,
+        179.815,
+        76.282,
+        41.71
+      ],
+      "defaultVisible": true,
+      "interactive": true,
+      "metadata": {
+        "width": 1619,
+        "height": 971,
+        "bytes": 107540,
+        "sha256": "1669daf9d80dcca0e5916d29545cadbbf034ab1270d29112c228dede0a7450ba",
+        "alphaBounds": [
+          817,
+          582,
+          247,
+          135
+        ],
+        "fullyTransparentFraction": 0.9853706850104546,
+        "partialAlphaFraction": 0.01459687325267851,
+        "visiblePixels": 19897
+      }
+    },
+    {
+      "id": "toolbar",
+      "label": "悬浮工具栏",
+      "file": "ui/toolbar.png",
+      "z": 100,
+      "category": "ui",
+      "sourceRect": [
+        628,
+        202,
+        917,
+        294
+      ],
+      "drawRect": [
+        352,
+        25,
+        129,
+        41
+      ],
+      "defaultVisible": false,
+      "interactive": true,
+      "metadata": {
+        "width": 2172,
+        "height": 724,
+        "bytes": 350733,
+        "sha256": "4e3785a6d2a28747cacd4f8fbd2d578202a8d17ef59308d780d7c98ee72f8641",
+        "alphaBounds": [
+          628,
+          202,
+          917,
+          294
+        ],
+        "fullyTransparentFraction": 0.8295610634596013,
+        "partialAlphaFraction": 0.1699391044229419,
+        "visiblePixels": 263601
+      }
+    }
+  ],
+  "animations": [
+    {
+      "id": "fire",
+      "label": "Devkidd 暖红火焰",
+      "z": 55,
+      "frames": [
+        "../../third-party/devkidd-pixel-fire/Pixel fire asset pack v1.2/Pixel Fire Asset Pack Colored/fire asset red/Group 6 - 1/Group 6 - 1_1.png",
+        "../../third-party/devkidd-pixel-fire/Pixel fire asset pack v1.2/Pixel Fire Asset Pack Colored/fire asset red/Group 6 - 1/Group 6 - 1_2.png",
+        "../../third-party/devkidd-pixel-fire/Pixel fire asset pack v1.2/Pixel Fire Asset Pack Colored/fire asset red/Group 6 - 1/Group 6 - 1_3.png",
+        "../../third-party/devkidd-pixel-fire/Pixel fire asset pack v1.2/Pixel Fire Asset Pack Colored/fire asset red/Group 6 - 1/Group 6 - 1_4.png",
+        "../../third-party/devkidd-pixel-fire/Pixel fire asset pack v1.2/Pixel Fire Asset Pack Colored/fire asset red/Group 6 - 1/Group 6 - 1_5.png",
+        "../../third-party/devkidd-pixel-fire/Pixel fire asset pack v1.2/Pixel Fire Asset Pack Colored/fire asset red/Group 6 - 1/Group 6 - 1_6.png",
+        "../../third-party/devkidd-pixel-fire/Pixel fire asset pack v1.2/Pixel Fire Asset Pack Colored/fire asset red/Group 6 - 1/Group 6 - 1_7.png",
+        "../../third-party/devkidd-pixel-fire/Pixel fire asset pack v1.2/Pixel Fire Asset Pack Colored/fire asset red/Group 6 - 1/Group 6 - 1_8.png"
+      ],
+      "frameSize": [
+        32,
+        48
+      ],
+      "frameDurationMs": 100,
+      "loop": true,
+      "filter": "nearest",
+      "drawRect": [
+        259,
+        117,
+        64,
+        96
+      ],
+      "origin": "bottom-center",
+      "source": {
+        "author": "Devkidd",
+        "pack": "Pixel Art Fire Asset Pack v1.2",
+        "url": "https://devkidd.itch.io/pixel-fire-asset-pack",
+        "usage": "Used in project via original files; not copied into the standalone generated-art export.",
+        "license": "Personal and commercial project use permitted; do not resell, redistribute or repackage as standalone files."
+      },
+      "frameSha256": [
+        "37cf43ba032b657b88f618e0348b2ba8ed5b7d3a2880fa28ba43aafb1711c964",
+        "bc3f2025a25e7212e8503b791492be25e10cdd0b6e048d9835e4e6999c906812",
+        "1ea0dca3d8d1c40220ce8a2081aaac6b182d36370534a2cc73d99c9b6676b02f",
+        "83dcd6c978f1a777a50116f38adc9e262c44240f7930a1e318f86e9a6b770194",
+        "db13c4ce33f3e9730a7b0503eaf0aea3366c1ad41d4233b5241d563d30464c79",
+        "8900ddfe7d66e9f426ad88960af494ee63a6623a1e4d9a3b532c61b77e151b23",
+        "556fb79f49bc016438957d415b711413c08938b82394f517df5b0d779b6f363c",
+        "d5bc47e5726300cdfd39e43dab1b82b1cb0926f413fc1e9ae1fb722fd5004cfe"
+      ]
+    }
+  ],
+  "hitRegions": [
+    {
+      "id": "tent",
+      "rect": [
+        21,
+        104,
+        135,
+        120
+      ]
+    },
+    {
+      "id": "kettle",
+      "rect": [
+        200,
+        180,
+        40,
+        43
+      ]
+    },
+    {
+      "id": "fire",
+      "rect": [
+        252,
+        126,
+        80,
+        98
+      ]
+    },
+    {
+      "id": "woodpile",
+      "rect": [
+        408,
+        181,
+        66,
+        42
+      ]
+    }
+  ],
+  "runtimeEffects": {
+    "steam": {
+      "origin": [
+        223,
+        184
+      ],
+      "method": "small animated pixel clusters behind kettle",
+      "maxCount": 8
+    }
+  },
+  "targets": {
+    "animationFps": 30,
+    "fireSpriteFps": 10,
+    "pauseWhenHidden": true,
+    "staticBackgroundCache": true
+  }
+};

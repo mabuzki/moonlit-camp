@@ -1,0 +1,11 @@
+{
+  "mode": "built-in image_gen edit",
+  "assets": [
+    {
+      "key": "tentOpenLit",
+      "file": "props/tent-open-lit-bedroll-v1.png",
+      "reference": "props/tent-bedroll.png",
+      "prompt": "Use case: lighting-weather, precise-object-edit. Image 1 is the exact edit target: an existing flat 2D pixel-art camping tent with its door flaps TIED OPEN and a rolled bedroll at the lower left, isolated on a large transparent canvas. Turn on a cozy warm amber interior light in the OPEN doorway, so the dark triangular interior becomes softly illuminated warm golden orange and casts a restrained warm tint on the inner edges of the flaps. Keep the doorway visibly OPEN, preserve the dark floor and fabric folds for depth; no new lamp or object. Apart from this lighting change, preserve the EXACT tent silhouette, all original pixels/texture as closely as possible, crossed wooden apex poles, orange piping, TIED-OPEN flaps, bedroll and its position, original side view and scale. Keep the SAME full 1619 by 971 transparent canvas and the SAME lower-left object placement. No crop, no recentering, no redesign, no exterior halo, no ground or cast shadow, no sky or other props, no text. Genuine transparent RGBA background. This sprite is the evening 'open door, lamp on' state in an existing game, and must align with the reference."
+    }
+  ]
+}

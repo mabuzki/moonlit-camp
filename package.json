@@ -1,0 +1,22 @@
+{
+  "name": "moonlit-camp-desktop",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "prepare:assets": "node tools/prepare-desktop-assets.mjs",
+    "dev": "node tools/prepare-desktop-assets.mjs && vite",
+    "build": "node tools/prepare-desktop-assets.mjs && tsc --noEmit && vite build",
+    "tauri": "tauri",
+    "test:desktop-ui": "node tools/test-desktop-ui.mjs",
+    "test:time-pause": "node tools/test-time-pause.mjs"
+  },
+  "dependencies": {
+    "@tauri-apps/api": "2.12.4"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "2.12.4",
+    "typescript": "7.0.2",
+    "vite": "8.3.7"
+  }
+}

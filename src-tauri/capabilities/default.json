@@ -1,0 +1,12 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "main-window",
+  "description": "Local controls for the campsite window",
+  "windows": ["main"],
+  "permissions": [
+    "core:default",
+    "core:window:allow-is-always-on-top",
+    "core:window:allow-set-position",
+    "core:window:allow-close"
+  ]
+}

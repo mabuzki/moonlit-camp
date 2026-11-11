@@ -1,0 +1,29 @@
+{
+  "openUnlit": {
+    "file": "props/rear-tent-open-unlit-v1.png",
+    "sourceRect": [
+      149,
+      142,
+      1005,
+      916
+    ]
+  },
+  "openLit": {
+    "file": "props/rear-tent-open-lit-v1.png",
+    "sourceRect": [
+      151,
+      143,
+      1000,
+      914
+    ]
+  },
+  "closedLit": {
+    "file": "props/rear-tent-closed-lit-v1.png",
+    "sourceRect": [
+      145,
+      140,
+      1015,
+      916
+    ]
+  }
+}

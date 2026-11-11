@@ -1,0 +1,10 @@
+{
+  "mode": "built-in image_gen edit",
+  "assets": [
+    {
+      "file": "props/blue-bedroll-isolated-v1.png",
+      "reference": "props/tent-bedroll.png",
+      "prompt": "Use case: background-extraction, precise-object-edit. Image 1 is the exact target. Extract ONLY the squat HORIZONTAL blue-gray rolled bedroll / cylindrical camping duffel at the LOWER LEFT of the tent. Preserve the existing roll's cool blue fabric, dark circular ends, two wide warm brown leather straps and small brass buckles, detailed retro pixel texture, flat 2D front/side view and horizontal approximately 2.3:1 silhouette. Remove the ENTIRE tent, all tent cloth, poles, orange tent edging and any ground behind the roll. Return exactly ONE complete horizontal blue roll alone, tightly framed with a small transparent margin. Do not turn it into an upright backpack, add a handle, redesign its straps, or add any objects. Clean genuine RGBA transparency outside the roll, no ground, cast shadow, halo, text or labels. It will be rendered at about 53 by 23 logical pixels in the same existing campsite."
+    }
+  ]
+}

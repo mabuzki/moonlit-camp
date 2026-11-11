@@ -1,0 +1,16 @@
+{
+  "mode": "built-in image_gen edit",
+  "reference": "props/tent-bedroll.png",
+  "assets": [
+    {
+      "key": "background",
+      "filename": "tent-closed-no-backpack-v1.png",
+      "prompt": "Use case: precise-object-edit. Asset type: transparent pixel-art game sprite for an existing pure 2D side-view desktop campsite. Image 1 is the edit target, not a loose reference. Edit the existing tent only: close its entrance completely with the same blue-gray canvas meeting in a clear vertical center seam, with no open doorway, no dark triangular hole, no rolled-back/tied-open flaps. REMOVE the entire rolled backpack/bedroll and every bag at the lower left. The output must contain exactly ONE closed, unlit tent alone, preserving the original crossed wooden apex poles, triangular proportions, detailed retro pixel texture, orange edging and muted blue-gray material. Use the same flat front-facing 2D view as the input, no added perspective. Preserve the original tent's silhouette and character as faithfully as possible. No lamp, no interior light, no extra props, no ground, no cast shadow, no text. Genuinely transparent RGBA background, clean alpha, full object visible with a small empty margin, tightly composed around the tent. The actual sprite will be rendered much smaller behind the main tent; keep the pixel silhouette readable."
+    },
+    {
+      "key": "main",
+      "filename": "tent-closed-lit-bedroll-v1.png",
+      "prompt": "Use case: precise-object-edit. Asset type: transparent pixel-art game sprite for an existing pure 2D side-view night campsite. Image 1 is the edit target. Keep this SAME large triangular blue-gray tent and its SAME rolled backpack/bedroll at the lower left, the crossed wooden apex poles, wooden details and orange edging. Close the entrance: bring the front canvas flaps together into a fully shut front panel with a vertical center seam; remove the open triangular doorway and tied-open flap appearance. It must clearly be a CLOSED tent, not an open glowing hole. The main tent is occupied at night with its light on: show a soft, cozy AMBER glow shining THROUGH the closed canvas at the center/lower front panel, warm but subdued, with visible fabric folds and pixel texture remaining over the light. No visible light bulb, no new window or object. Keep the rest of the tent cool blue-gray, retain the original side-view flat 2D proportions and detailed retro pixel-art style, no extra perspective. Preserve the backpack and its position. No landscape, no ground, no exterior glow halo or cast shadow, no text. Genuinely transparent RGBA background, full tent and backpack visible, clean alpha, small empty margin and a tight composition around the entire sprite."
+    }
+  ]
+}

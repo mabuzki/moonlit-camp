@@ -1,0 +1,17 @@
+{
+  "mode": "built-in image_gen edit",
+  "assets": [
+    {
+      "key": "sky",
+      "file": "background/05-sky-no-celestials-v1.png",
+      "reference": "background/04-sky-moon-no-stars.png",
+      "prompt": "Use case: precise-object-edit. Image 1 is the exact edit target: the isolated blue-gray pixel sky layer from an existing flat 2D campsite game. Remove ONLY the single large cream crescent moon, filling its position seamlessly with the surrounding blue-gray sky texture and faint horizontal haze. Keep everything else exactly unchanged: sky color, texture, dimensions, full 5:3 landscape canvas, irregular scalloped outer silhouette, same position on the canvas, same alpha transparency. No stars, moon, sun or celestial object may remain anywhere. No new elements, no mountains, trees, ground, clouds, props, text, borders or background rectangle. Do NOT crop, recenter, redesign or change the outline. The output will be an exact replacement background layer with sun and moon animated separately in code. Genuine RGBA transparency outside the original shape."
+    },
+    {
+      "key": "tentUnlit",
+      "file": "props/tent-closed-unlit-bedroll-v1.png",
+      "reference": "props/tent-closed-lit-bedroll-v1.png",
+      "prompt": "Use case: precise-object-edit. Image 1 is the exact edit target: a closed triangular pixel-art tent with a rolled bedroll at the lower left, on a large transparent canvas. Make ONE narrowly scoped change: switch OFF the amber interior lamp, removing ALL yellow/amber glow through the central lower front canvas, restoring that front fabric to the same cool blue-gray material as the unlit tent sides. Preserve the CLOSED center seam, exact front folds, crossed wooden apex, orange outer edging, bedroll, original pixel texture, every silhouette edge, original scale and location on the full 5:3 canvas. Do not open the entrance, add or remove bags, reshape or reposition anything, crop or recenter. No light, no interior glow, no shadows outside the object. Exact same 1620 by 971 composition if possible, genuine transparent RGBA background. This must align pixel-for-pixel with its lit reference for a smooth runtime day/night crossfade."
+    }
+  ]
+}

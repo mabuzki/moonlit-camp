@@ -1,0 +1,21 @@
+[package]
+name = "moonlit-camp"
+version = "0.1.0"
+description = "A tiny transparent moonlit campsite for your desktop"
+edition = "2021"
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = ["tray-icon"] }
+serde = { version = "1", features = ["derive"] }
+
+[target.'cfg(windows)'.dependencies]
+windows = { version = "0.62", features = ["Win32_Foundation", "Win32_Graphics_Dwm", "Win32_Graphics_Gdi", "Win32_UI_WindowsAndMessaging"] }
+
+[profile.release]
+strip = true
+opt-level = "s"
+lto = "thin"
+codegen-units = 1

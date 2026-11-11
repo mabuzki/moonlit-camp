@@ -1,0 +1,48 @@
+桌面营地小游戏：技术栈评估
+评估日期：2026-11-10
+
+建议
+首选 Tauri 2 + TypeScript + Vite + Canvas 2D。桌面外壳用 Rust 管理窗口、置顶、托盘、设置和鼠标穿透；前端绘制图层、播放原始火焰帧并处理物件交互。当前无需 React、数据库、物理引擎或完整游戏引擎。
+这是基于当前 500×300 小窗、少量精灵与循环动画的工程判断，并非已经测得的性能结论。当前交付是素材与浏览器验证页，还未实现或压测原生桌面程序。
+
+为什么先用 Canvas 2D
+当前场景只有约十个图层和一条 8 帧火焰循环，绘制、命中区域和排序都较简单。将静态背景预合成到离屏缓存，每次只更新火焰、少量蒸汽和悬浮状态即可。
+目标是最多 30 FPS，火焰保留素材的 10 FPS；窗口隐藏时停止绘制。通过设备像素比处理屏幕缩放，像素精灵禁用平滑。CPU、GPU 和内存必须在目标电脑上测量，不承诺未经测试的固定数值。
+当前试导出的完整透明画布占用更多解码内存。正式版本应按 sourceRect 裁切并打成紧凑图集；本次保留原始输出以便复核和调整摆放。
+如果后续出现大量可摆放物件、粒子、复杂滤镜或动态雾，再考虑迁到 PixiJS。素材清单与交互配置可继续复用。
+
+方案比较
+Tauri 2 + Canvas 2D：首选。Windows 使用系统 WebView2，支持透明、无边框、置顶等窗口配置。开发需要 Rust/MSVC、C++ Build Tools 和 WebView2。透明像素不会自动成为可点穿的区域，需要命中检测与原生窗口事件策略。
+Electron + Canvas 2D：备选，适合优先快速打通桌面行为。提供 setIgnoreMouseEvents，并可在 Windows 转发鼠标移动事件；透明空白区域仍需主动切换穿透。内置 Chromium 带来更大的发布运行时，具体常驻内存应实测。
+Godot：若未来变成有角色、天气、物理与大量游戏系统的完整小游戏，价值会上升。现阶段桌面集成是主要难点，Godot 的 Windows 区域穿透行为需要目标版本实机核验；不能把引擎里的鼠标过滤当成跨应用点穿。
+Windows 原生 WPF/Win32：如果只支持 Windows，可以作为进一步减少 WebView 依赖的候选；开发与渲染代码会偏离现有 Web 预览。当前未验证其实现，不作为首选承诺。
+
+当前开发环境核验
+已发现 Node 24.22.1 和 PowerShell 7.6.9。
+PATH 与默认用户安装位置未发现 Rust/Cargo；dotnet 报告未发现 SDK（运行时不等于 SDK）。本次没有安装新的系统开发工具。
+因此当前可以直接验证素材和 Canvas；开始 Tauri 桌面开发前还需要补齐并核验开发工具链。
+
+桌面外壳的首个验证项
+1. 500×300 DIP 无边框透明窗口；在 100%、125%、150% 和 200% 显示缩放下检查像素清晰度。
+2. 置顶可切换；托盘有退出、恢复、重置位置入口；设置保存本地。
+3. 命中帐篷、火堆、水壶、木堆或工具栏时接收输入，其余透明区域允许点到背后的应用。说明：透明显示与鼠标穿透是两个独立能力。
+4. 验证穿透开启后如何重新捕获鼠标：Electron 可转发移动事件；Tauri 可评估低频原生光标轮询/Win32 命中策略。避免不断切换整窗造成闪烁或输入丢失。背景是否也接收鼠标应做成明确策略。
+5. 全局快捷键或托盘入口可恢复操作，避免开启完全穿透后无法操控。
+6. 验证拖动不抢掉物件点击；窗口隐藏时暂停动画；恢复、切屏和更换缩放后无黑底或白闪。
+7. 合并主进程和 WebView 子进程后测量实际常驻内存、空闲 CPU 和 GPU，不能只看进程树的一行。
+
+素材接入
+本次使用 assets/export/moonlit-camp-v1/scene.json 作为引擎无关的资源/摆放描述。
+火焰直接引用已经下载的 Devkidd 32×48、8 帧资源；不在生成素材包内重复打包。静态层是从合成稿补画拆分的试导出，已标明不是无损原图层。
+现有各景层已包含不同浓度的雾。完全动态的雾量和天气还需要独立雾蒙版或专门的绘制效果，不可仅靠图层透明度冒充同等效果。
+
+核对来源（官方文档与作者页面）
+Tauri 窗口配置：https://v2.tauri.app/reference/config/#windowconfig
+Tauri 窗口 API：https://v2.tauri.app/reference/javascript/api/namespacewindow/
+Tauri 进程模型：https://v2.tauri.app/concept/process-model/
+Tauri Windows 开发依赖：https://v2.tauri.app/start/prerequisites/
+Electron 透明窗口与限制：https://www.electronjs.org/docs/latest/tutorial/custom-window-styles
+Electron 鼠标穿透与移动事件转发：https://www.electronjs.org/docs/latest/tutorial/custom-window-interactions
+Godot 桌面应用与透明叠加：https://docs.godotengine.org/en/stable/tutorials/ui/creating_applications.html
+Godot Windows 穿透问题跟踪：https://github.com/godotengine/godot/issues/120881
+火焰作者、资源与条款：https://devkidd.itch.io/pixel-fire-asset-pack

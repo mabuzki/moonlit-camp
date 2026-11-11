@@ -1,0 +1,24 @@
+{
+  "mode": "built-in image_gen edit",
+  "execution": "Interrupted initial batch at user request; generated each state sequentially with one reference image.",
+  "assets": [
+    {
+      "key": "openUnlit",
+      "file": "props/rear-tent-open-unlit-v1.png",
+      "reference": "props/tent-closed-no-backpack-v1.png",
+      "prompt": "Use case: precise-object-edit. Image 1 is the exact target: a single bag-free blue-gray triangular pixel-art tent. Make just one change: open its front entrance, tying back the two canvas door flaps to reveal a dark brown UNLIT interior. Lamp OFF, no glow. Preserve the exact outer triangular silhouette, proportions, crossed wooden apex poles, orange piping, detailed pixel texture, and flat front-facing 2D view. No backpack, bedroll, bag, person, furniture, lamp or new prop. Exactly one complete tent, not a sheet. Transparent RGBA background, small empty margin, no ground or cast shadow, no text. Keep all original tent details except the now-open doorway."
+    },
+    {
+      "key": "openLit",
+      "file": "props/rear-tent-open-lit-v1.png",
+      "reference": "props/rear-tent-open-unlit-v1.png",
+      "prompt": "Use case: lighting-weather. Image 1 is the exact target: a bag-free blue-gray pixel-art tent with tied OPEN door flaps and a dark interior. Change ONLY the interior lighting: turn on a cozy amber light inside the OPEN doorway. Show warm golden light in the interior and a restrained warm tint on the inner flap edges. Keep a dark floor and visible pixel texture. Preserve the exact tent silhouette, proportions, crossed apex poles, orange piping, open door flaps, flat front view, scale and full canvas composition. No backpack, bedroll, bag, person, furniture, visible lamp, window or other prop. No exterior halo, ground, shadow, text or background. Exactly one tent. Genuine RGBA transparency."
+    },
+    {
+      "key": "closedLit",
+      "file": "props/rear-tent-closed-lit-v1.png",
+      "reference": "props/tent-closed-no-backpack-v1.png",
+      "prompt": "Use case: lighting-weather. Image 1 is the exact target: a bag-free blue-gray pixel-art tent with its front entrance CLOSED. Change ONLY its lighting: turn on a subdued amber lamp inside, so a cozy warm light shines THROUGH the lower central closed canvas. Keep the closed center seam, folds and texture clearly visible over the glow. Preserve the exact closed door, triangular silhouette, proportions, crossed apex poles, orange piping, flat front view, scale and full canvas composition. No open doorway or dark hole, no new window. No backpack, bedroll, bag, person, furniture, visible lamp, ground, cast shadow, exterior halo, text or background. Exactly one complete tent on genuine RGBA transparency."
+    }
+  ]
+}

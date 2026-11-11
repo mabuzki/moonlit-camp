@@ -1,0 +1,12 @@
+{
+  "passed": true,
+  "staticLayers": 10,
+  "imagesLoaded": 18,
+  "fireFrames": 8,
+  "animationAdvanced": true,
+  "pause": true,
+  "layerToggle": true,
+  "woodpileInteraction": true,
+  "fireHashesMatchOriginals": true,
+  "checks": "PNG alpha / source references / frame animation / pause / layer toggle / checkerboard / interaction / browser errors"
+}

@@ -1,0 +1,10 @@
+node_modules/
+dist/
+public/art/
+public/scene.json
+src-tauri/target/
+src-tauri/gen/
+output/
+assets/third-party/devkidd-pixel-fire/Pixel fire asset pack v1.2/
+assets/third-party/devkidd-pixel-fire/Pixel fire asset pack v1.2.zip
+.DS_Store

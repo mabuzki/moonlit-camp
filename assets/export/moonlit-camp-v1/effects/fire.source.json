@@ -1,0 +1,46 @@
+{
+  "id": "fire",
+  "label": "Devkidd 暖红火焰",
+  "z": 55,
+  "frames": [
+    "../../third-party/devkidd-pixel-fire/Pixel fire asset pack v1.2/Pixel Fire Asset Pack Colored/fire asset red/Group 6 - 1/Group 6 - 1_1.png",
+    "../../third-party/devkidd-pixel-fire/Pixel fire asset pack v1.2/Pixel Fire Asset Pack Colored/fire asset red/Group 6 - 1/Group 6 - 1_2.png",
+    "../../third-party/devkidd-pixel-fire/Pixel fire asset pack v1.2/Pixel Fire Asset Pack Colored/fire asset red/Group 6 - 1/Group 6 - 1_3.png",
+    "../../third-party/devkidd-pixel-fire/Pixel fire asset pack v1.2/Pixel Fire Asset Pack Colored/fire asset red/Group 6 - 1/Group 6 - 1_4.png",
+    "../../third-party/devkidd-pixel-fire/Pixel fire asset pack v1.2/Pixel Fire Asset Pack Colored/fire asset red/Group 6 - 1/Group 6 - 1_5.png",
+    "../../third-party/devkidd-pixel-fire/Pixel fire asset pack v1.2/Pixel Fire Asset Pack Colored/fire asset red/Group 6 - 1/Group 6 - 1_6.png",
+    "../../third-party/devkidd-pixel-fire/Pixel fire asset pack v1.2/Pixel Fire Asset Pack Colored/fire asset red/Group 6 - 1/Group 6 - 1_7.png",
+    "../../third-party/devkidd-pixel-fire/Pixel fire asset pack v1.2/Pixel Fire Asset Pack Colored/fire asset red/Group 6 - 1/Group 6 - 1_8.png"
+  ],
+  "frameSize": [
+    32,
+    48
+  ],
+  "frameDurationMs": 100,
+  "loop": true,
+  "filter": "nearest",
+  "drawRect": [
+    259,
+    117,
+    64,
+    96
+  ],
+  "origin": "bottom-center",
+  "source": {
+    "author": "Devkidd",
+    "pack": "Pixel Art Fire Asset Pack v1.2",
+    "url": "https://devkidd.itch.io/pixel-fire-asset-pack",
+    "usage": "Used in project via original files; not copied into the standalone generated-art export.",
+    "license": "Personal and commercial project use permitted; do not resell, redistribute or repackage as standalone files."
+  },
+  "frameSha256": [
+    "37cf43ba032b657b88f618e0348b2ba8ed5b7d3a2880fa28ba43aafb1711c964",
+    "bc3f2025a25e7212e8503b791492be25e10cdd0b6e048d9835e4e6999c906812",
+    "1ea0dca3d8d1c40220ce8a2081aaac6b182d36370534a2cc73d99c9b6676b02f",
+    "83dcd6c978f1a777a50116f38adc9e262c44240f7930a1e318f86e9a6b770194",
+    "db13c4ce33f3e9730a7b0503eaf0aea3366c1ad41d4233b5241d563d30464c79",
+    "8900ddfe7d66e9f426ad88960af494ee63a6623a1e4d9a3b532c61b77e151b23",
+    "556fb79f49bc016438957d415b711413c08938b82394f517df5b0d779b6f363c",
+    "d5bc47e5726300cdfd39e43dab1b82b1cb0926f413fc1e9ae1fb722fd5004cfe"
+  ]
+}

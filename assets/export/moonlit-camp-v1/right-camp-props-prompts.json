@@ -1,0 +1,9 @@
+{
+  "mode": "built-in image_gen generate",
+  "assets": [
+    {
+      "file": "props/backpack-olive-upright-v1.png",
+      "prompt": "Use case: stylized-concept. Asset type: ONE transparent pixel-art sprite for an existing flat 2D side-view camping desktop game. Subject: a compact UPRIGHT olive-green canvas hiking BACKPACK, with a rounded flap top, a top handle, two warm brown leather buckle straps, one front pocket and two small side pockets. Clearly a vertical soft hiking backpack, NOT a horizontal bedroll, sleeping bag, duffel or tent. Detailed retro pixel art using crisp square pixel clusters, subtle dithering, muted olive/sage canvas, brown leather and small brass hardware. Flat front-facing 2D elevation, no isometric or 3D perspective. Readable silhouette designed to display at about 23 by 28 logical pixels beside a tent. Modest high-detail sprite; avoid photorealism, smooth vector shapes and blurry outlines. Exactly one complete backpack, tightly framed with a small empty margin, no ground, cast shadow, other objects, labels, letters, logo or watermark. Genuine transparent RGBA background."
+    }
+  ]
+}

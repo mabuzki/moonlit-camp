@@ -1,0 +1,11 @@
+id,category,file,width,height,bytes,transparent_fraction
+sky,background,background/00-sky-moon-stars.png,1619,971,1011072,0.51627
+far,background,background/01-far-mountains-mist.png,1620,971,696691,0.66681
+middle,background,background/02-mid-forest-mist.png,1619,971,431283,0.81462
+near,background,background/03-near-hills-pines.png,1620,971,520022,0.75926
+ground,terrain,terrain/ground-grass-stones.png,1619,972,238126,0.94013
+tent,props,props/tent-bedroll.png,1619,971,230424,0.94114
+kettle,props,props/kettle.png,1619,971,83561,0.99159
+woodpile,props,props/woodpile.png,1619,971,92660,0.98651
+fire-base,props,props/fire-base-stones-logs.png,1619,971,107540,0.98537
+toolbar,ui,ui/toolbar.png,2172,724,350733,0.82956

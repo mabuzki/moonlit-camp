@@ -1,0 +1,13 @@
+素材包：Pixel Art Fire Asset Pack v1.2
+作者：Devkidd
+来源：https://devkidd.itch.io/pixel-fire-asset-pack
+下载日期：2026-11-10
+获取方式：作者页面提供的免费直接下载
+原始文件：Pixel fire asset pack v1.2.zip
+文件大小：8,204,151 字节
+SHA-256：6C18F3FCA12FA3036D6FD1D5AF08355F8A5610270D5DB189B2883338F0C64F98
+
+内容核验：解压得到 2,514 个文件，包括 2,250 个 PNG、248 个 GIF、15 个 Aseprite 源文件及 1 个说明文件。
+原始压缩包和解压后的作者文件均保留。
+
+作者页面授权摘要：可用于个人和商业项目；署名为可选；不可将素材作为独立文件转售、再分发或重新打包，即使已修改。完整条款以作者原页面为准。

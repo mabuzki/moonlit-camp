@@ -1,0 +1,28 @@
+{
+  "background": {
+    "file": "props/tent-closed-no-backpack-v1.png",
+    "sourceRect": [
+      146,
+      140,
+      1015,
+      918
+    ],
+    "imageSize": [
+      1312,
+      1199
+    ]
+  },
+  "main": {
+    "file": "props/tent-closed-lit-bedroll-v1.png",
+    "sourceRect": [
+      69,
+      337,
+      435,
+      385
+    ],
+    "imageSize": [
+      1620,
+      971
+    ]
+  }
+}

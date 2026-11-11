@@ -1,0 +1,136 @@
+{
+  "sky": {
+    "file": "background/04-sky-moon-no-stars.png",
+    "sourceRect": [
+      0,
+      0,
+      1619,
+      971
+    ],
+    "drawRect": [
+      0,
+      0,
+      500,
+      300
+    ]
+  },
+  "clouds": [
+    {
+      "file": "effects/cloud-bank.png",
+      "sourceRect": [
+        129,
+        184,
+        1919,
+        349
+      ],
+      "width": 190,
+      "height": 34.554455445544555,
+      "y": 51,
+      "initialX": 170,
+      "speed": -2,
+      "flip": false
+    },
+    {
+      "file": "effects/cloud-wisp.png",
+      "sourceRect": [
+        97,
+        197,
+        1995,
+        332
+      ],
+      "width": 174,
+      "height": 28.956390977443608,
+      "y": 35,
+      "initialX": -130,
+      "speed": 1.2,
+      "flip": false
+    },
+    {
+      "file": "effects/cloud-wisp.png",
+      "sourceRect": [
+        97,
+        197,
+        1995,
+        332
+      ],
+      "width": 150,
+      "height": 24.962406015037594,
+      "y": 76,
+      "initialX": 390,
+      "speed": -0.85,
+      "flip": true
+    }
+  ],
+  "stars": [
+    {
+      "x": 125,
+      "y": 80,
+      "size": 1,
+      "phase": 0.2,
+      "period": 4600
+    },
+    {
+      "x": 196,
+      "y": 57,
+      "size": 2,
+      "phase": 0,
+      "period": 3600
+    },
+    {
+      "x": 234,
+      "y": 80,
+      "size": 1,
+      "phase": 2,
+      "period": 5300
+    },
+    {
+      "x": 358,
+      "y": 85,
+      "size": 1,
+      "phase": 1,
+      "period": 4200
+    },
+    {
+      "x": 286,
+      "y": 53,
+      "size": 1,
+      "phase": 4,
+      "period": 6000
+    },
+    {
+      "x": 302,
+      "y": 70,
+      "size": 1,
+      "phase": 2.6,
+      "period": 5100
+    },
+    {
+      "x": 104,
+      "y": 107,
+      "size": 1,
+      "phase": 3.4,
+      "period": 3900
+    },
+    {
+      "x": 395,
+      "y": 101,
+      "size": 1,
+      "phase": 1.8,
+      "period": 6400
+    }
+  ],
+  "moonProbe": [
+    160,
+    75
+  ],
+  "order": [
+    "sky-moon",
+    "twinkling-stars",
+    "moving-clouds",
+    "far-mountains",
+    "mid-forest",
+    "near-hills",
+    "camp"
+  ],
+  "source": "Clouds and star-free sky generated with built-in ImageGen; cloud cores occlude stars and moon."
+}

@@ -1,0 +1,29 @@
+{
+  "sky": {
+    "file": "background/05-sky-no-celestials-v1.png",
+    "sourceRect": [
+      0,
+      0,
+      1619,
+      971
+    ]
+  },
+  "tentUnlit": {
+    "file": "props/tent-closed-unlit-bedroll-v1.png",
+    "sourceRect": [
+      67,
+      338,
+      438,
+      385
+    ]
+  },
+  "tentOpenLit": {
+    "file": "props/tent-open-lit-bedroll-v1.png",
+    "sourceRect": [
+      70,
+      336,
+      435,
+      387
+    ]
+  }
+}

@@ -1,16 +1,14 @@
 use tauri::{AppHandle, Manager, WebviewUrl, WebviewWindowBuilder};
 
-const FIRE_DOWNLOAD_URL: &str = "https://devkidd.itch.io/pixel-fire-asset-pack";
-
 #[tauri::command]
 pub async fn show_about(app: AppHandle) -> Result<(), String> {
     if let Some(window) = app.get_webview_window("about") {
         window.show().map_err(|e| e.to_string())?;
         return window.set_focus().map_err(|e| e.to_string());
     }
-    WebviewWindowBuilder::new(&app, "about", WebviewUrl::App("about.html".into()))
-        .title("关于月下营地")
-        .inner_size(440.0, 560.0)
+    let window = WebviewWindowBuilder::new(&app, "about", WebviewUrl::App("about.html".into()))
+        .title(crate::i18n::current(&app).text("aboutTitle"))
+        .inner_size(440.0, 340.0)
         .resizable(false)
         .maximizable(false)
         .minimizable(false)
@@ -21,7 +19,9 @@ pub async fn show_about(app: AppHandle) -> Result<(), String> {
         .center()
         .build()
         .map_err(|e| e.to_string())?;
-    Ok(())
+    // A language switch can arrive while the WebView is being created.
+    window.set_title(crate::i18n::current(&app).text("aboutTitle"))
+        .map_err(|e| e.to_string())
 }
 
 pub fn open(app: &AppHandle) {
@@ -32,7 +32,13 @@ pub fn open(app: &AppHandle) {
 }
 
 #[tauri::command]
-pub fn open_fire_download() -> Result<(), String> {
+pub fn open_credit_link(link: &str) -> Result<(), String> {
+    let address = match link {
+        "fire-pack" => "https://devkidd.itch.io/pixel-fire-asset-pack",
+        "fire-recording" => "https://freesound.org/people/homejrande/sounds/17374/",
+        "recording-license" => "https://creativecommons.org/licenses/by-nc/3.0/",
+        _ => return Err("Unknown asset link".into()),
+    };
     #[cfg(target_os = "windows")]
     {
         use std::ptr::null;
@@ -48,15 +54,15 @@ pub fn open_fire_download() -> Result<(), String> {
             ) -> isize;
         }
         let operation: Vec<u16> = "open\0".encode_utf16().collect();
-        let url: Vec<u16> = FIRE_DOWNLOAD_URL.encode_utf16().chain([0]).collect();
+        let url: Vec<u16> = address.encode_utf16().chain([0]).collect();
         let result =
             unsafe { ShellExecuteW(0, operation.as_ptr(), url.as_ptr(), null(), null(), 1) };
         if result > 32 {
             Ok(())
         } else {
-            Err("无法打开浏览器，请复制素材页面地址访问".into())
+            Err(format!("ShellExecuteW failed with code {result}"))
         }
     }
     #[cfg(not(target_os = "windows"))]
-    Err(format!("请在浏览器访问 {FIRE_DOWNLOAD_URL}"))
+    Err(format!("Could not open {address}"))
 }

@@ -11,7 +11,8 @@ use windows::{
             EnumWindows, GetClassNameW, GetShellWindow, GetWindowLongW, GetWindowRect,
             GetWindowThreadProcessId, IsIconic, IsWindowVisible, IsZoomed, SetWindowPos,
             GWL_EXSTYLE, GWL_STYLE, HWND_NOTOPMOST, HWND_TOPMOST, SWP_NOACTIVATE, SWP_NOMOVE,
-            SWP_NOOWNERZORDER, SWP_NOSIZE, WS_CAPTION, WS_EX_TOPMOST,
+            SWP_NOOWNERZORDER, SWP_NOSIZE, WS_CAPTION, WS_EX_LAYERED, WS_EX_TOPMOST,
+            WS_EX_TRANSPARENT,
         },
     },
 };
@@ -89,6 +90,12 @@ fn covers_screen(window: &RECT, screen: &RECT) -> bool {
 
 fn covers_screen_near_camp(window: HWND, camp: &RECT) -> bool {
     if !unsafe { IsWindowVisible(window) }.as_bool() || unsafe { IsIconic(window) }.as_bool() {
+        return false;
+    }
+    // Windows input surfaces such as ShellHandwritingCanvas can span an entire screen.
+    let ex_style = unsafe { GetWindowLongW(window, GWL_EXSTYLE) } as u32;
+    let click_through_overlay = WS_EX_LAYERED.0 | WS_EX_TRANSPARENT.0;
+    if ex_style & click_through_overlay == click_through_overlay {
         return false;
     }
     let mut bounds = RECT::default();

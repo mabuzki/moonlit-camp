@@ -56,7 +56,7 @@ Campamento a la luz de la luna es un pequeño campamento animado en pixel art pa
 
 Get `MoonlitCamp.exe` from [GitHub Releases](https://github.com/mabuzki/moonlit-camp/releases). The portable build runs on 64-bit Windows with Microsoft Edge WebView2 Runtime. Run the executable and use the system tray icon to show or quit the camp.
 
-The multilingual interface is in development. In builds with language support, the app follows your Windows display language and uses English as a fallback. Right-click the tray icon and open **Language** to choose a language. The app remembers your choice.
+The app follows your Windows display language and uses English as a fallback. Right-click the tray icon and open **Language** to choose a language. The app remembers your choice.
 
 ## Run from source
 
@@ -70,3 +70,8 @@ pnpm dev
 ```
 
 Run `pnpm tauri dev` for the native window or `pnpm tauri build --no-bundle` to compile the portable executable.
+
+## Credits
+
+- Campfire animation from Devkidd’s [Pixel Art Fire Asset Pack v1.2](https://devkidd.itch.io/pixel-fire-asset-pack).
+- Campfire audio uses the first 24 seconds of [fire wood bonfire high eq.aif](https://freesound.org/people/homejrande/sounds/17374/) by homejrande, edited into a loop under [CC BY-NC 3.0](https://creativecommons.org/licenses/by-nc/3.0/).

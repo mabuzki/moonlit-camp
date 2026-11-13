@@ -1,3 +1,6 @@
+import campfireUrl from "./assets/campfire-loop.wav?url";
+import { t } from "./i18n";
+
 export class CampAudio {
   private context: AudioContext | null = null;
   private gain: GainNode | null = null;
@@ -27,30 +30,27 @@ export class CampAudio {
     await this.syncPlayback();
   }
   async setEnabled(enabled: boolean) {
-    this.enabled = enabled;
     if (!this.context && enabled) {
       const context = new AudioContext();
-      this.context = context;
-      const buffer = context.createBuffer(
-        1,
-        context.sampleRate * 3,
-        context.sampleRate,
-      );
-      const data = buffer.getChannelData(0);
-      for (let i = 0; i < data.length; i++)
-        data[i] = (Math.random() * 2 - 1) * (Math.random() > 0.999 ? 1 : 0.13);
-      const source = context.createBufferSource();
-      source.buffer = buffer;
-      source.loop = true;
-      const filter = context.createBiquadFilter();
-      filter.type = "lowpass";
-      filter.frequency.value = 1800;
-      const gain = context.createGain();
-      gain.gain.value = 0;
-      this.gain = gain;
-      source.connect(filter).connect(gain).connect(context.destination);
-      source.start();
+      try {
+        const response = await fetch(campfireUrl);
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        const buffer = await context.decodeAudioData(await response.arrayBuffer());
+        const source = context.createBufferSource();
+        source.buffer = buffer;
+        source.loop = true;
+        const gain = context.createGain();
+        gain.gain.value = 0;
+        source.connect(gain).connect(context.destination);
+        source.start();
+        this.context = context;
+        this.gain = gain;
+      } catch (error) {
+        await context.close().catch(() => {});
+        throw new Error(t("audioLoadFailed"), { cause: error });
+      }
     }
+    this.enabled = enabled;
     await this.syncPlayback();
   }
 }

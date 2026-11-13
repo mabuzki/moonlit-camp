@@ -12,7 +12,7 @@ const runtime = JSON.parse(fs.readFileSync(path.join(root, "output/runtime/" + (
 const browser = native
   ? await chromium.connectOverCDP("http://127.0.0.1:" + runtime.debugPort)
   : await chromium.launch({ channel: "msedge", headless: true });
-let page, original, saved;
+let page, original, saved, originalNativePause;
 const errors = [];
 const command = id => page.evaluate(id => window.__CAMP__.command(id), id);
 const sample = () => page.evaluate(() => {
@@ -49,6 +49,7 @@ try {
   page.on("pageerror", error => errors.push(error.message));
   await page.waitForFunction(() => window.__CAMP__?.ready);
   if (native) await page.waitForFunction(async () => (await window.__CAMP__.desktopStatus())?.ready);
+  if (native) originalNativePause = await page.evaluate(() => window.__TAURI_INTERNALS__.invoke("load_time_pause"));
   ({ state: original, saved } = await page.evaluate(() => ({ state: { ...window.__CAMP__.state }, saved: localStorage.getItem("camp-settings") })));
   await page.evaluate(() => Object.assign(window.__CAMP__.state, {
     paused: true, timePausedAt: null, clock: 0, cycleOffset: 0,
@@ -129,6 +130,27 @@ try {
     await command("pause-time");
     sameTime(before.light, (await sample()).light);
   }
+  if (!native) {
+    await page.evaluate(() => Object.assign(window.__CAMP__.state, {
+      clock: 3_750_000, cycleOffset: 0.97,
+    }));
+    await command("pause-time");
+    await command("cycle-45");
+    const beforeReload = await sample();
+    await page.reload();
+    await page.waitForFunction(() => window.__CAMP__?.ready);
+    assert.equal(await page.evaluate(() => window.__CAMP__.state.timePausedAt), 0);
+    await page.waitForFunction(() => window.__CAMP__.state.clock > 200);
+    const afterReload = await sample();
+    sameTime(beforeReload.light, afterReload.light);
+    assert.equal(afterReload.light.durationMs, 45 * 60_000);
+    await command("pause");
+    await command("pause-time");
+    sameTime(beforeReload.light, (await sample()).light);
+    await page.reload();
+    await page.waitForFunction(() => window.__CAMP__?.ready);
+    assert.equal(await page.evaluate(() => window.__CAMP__.state.timePausedAt), null);
+  }
   assert.deepEqual(errors, []);
   assert.deepEqual(await page.evaluate(() => window.__CAMP__.errors), []);
   const result = {
@@ -141,11 +163,12 @@ try {
   fs.writeFileSync(path.join(root, `output/desktop-build/time-pause-${native ? "native" : "browser"}-validation.json`), JSON.stringify(result, null, 2) + "\n");
   console.log(JSON.stringify(result, null, 2));
 } finally {
-  if (original) await page.evaluate(async ({ state, saved }) => {
+  if (original) await page.evaluate(async ({ state, saved, native, originalNativePause }) => {
     Object.assign(window.__CAMP__.state, state);
     await window.__CAMP__.command(`cycle-${state.cycleMinutes}`);
+    if (native) await window.__TAURI_INTERNALS__.invoke("save_time_pause", { pausedCycleOffset: originalNativePause });
     if (saved === null) localStorage.removeItem("camp-settings");
     else localStorage.setItem("camp-settings", saved);
-  }, { state: original, saved }).catch(error => console.error("Could not restore camp settings:", error));
+  }, { state: original, saved, native, originalNativePause }).catch(error => console.error("Could not restore camp settings:", error));
   await browser.close();
 }

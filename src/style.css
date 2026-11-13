@@ -54,8 +54,11 @@ body {
 }
 .loading {
   position: absolute;
-  left: 150px;
+  left: 50%;
   top: 130px;
+  transform: translateX(-50%);
+  width: max-content;
+  max-width: calc(100% - 24px);
   font-size: 12px;
   background: #262a32f0;
   color: #d4c6ae;

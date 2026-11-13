@@ -6,25 +6,32 @@ use std::sync::{
     Arc, Mutex,
 };
 use std::time::{Duration, Instant};
-use tauri::{Emitter, Manager, State, WebviewWindow};
+use tauri::{window::Monitor, Emitter, Manager, State, WebviewWindow};
 mod about;
 #[cfg(target_os = "windows")]
 mod fullscreen;
+mod i18n;
+#[cfg(target_os = "windows")]
+mod monitor;
+mod settings;
+#[cfg(target_os = "windows")]
+mod startup;
 mod tray;
 
 const MIN_ZOOM_PERCENT: u16 = 70;
 const MAX_ZOOM_PERCENT: u16 = 150;
 const ZOOM_STEP_PERCENT: usize = 10;
 const FULLSCREEN_EVENT: &str = "camp-fullscreen";
+const WINDOW_PLACEMENT_FILE: &str = "window-placement.json";
 
-fn validate_zoom(zoom: f64) -> Result<(), String> {
+fn validate_zoom(window: &WebviewWindow, zoom: f64) -> Result<(), String> {
     let percent = zoom * 100.0;
     if !zoom.is_finite()
         || !(MIN_ZOOM_PERCENT as f64..=MAX_ZOOM_PERCENT as f64).contains(&percent)
         || (percent - percent.round()).abs() > 1e-8
         || percent.round() as usize % ZOOM_STEP_PERCENT != 0
     {
-        return Err("缩放范围为 70%–150%，步进 10%".into());
+        return Err(i18n::current(window.app_handle()).text("zoomRange").into());
     }
     Ok(())
 }
@@ -43,6 +50,7 @@ struct HitState {
     ground_baseline: AtomicU64,
     docked: AtomicBool,
     dragging: AtomicBool,
+    pending_placement: Mutex<Option<WindowPlacement>>,
 }
 
 #[derive(Deserialize, Serialize)]
@@ -51,6 +59,18 @@ struct WindowPlacement {
     x: f64,
     y: f64,
     docked: bool,
+}
+
+impl WindowPlacement {
+    fn read(window: &WebviewWindow) -> Option<Self> {
+        settings::read(window, WINDOW_PLACEMENT_FILE)
+    }
+
+    fn save(&self, window: &WebviewWindow) -> Result<(), String> {
+        settings::save(window, WINDOW_PLACEMENT_FILE, self).map_err(|error| {
+            format!("{} {error}", i18n::current(window.app_handle()).text("savePlacementFailed"))
+        })
+    }
 }
 
 #[derive(Serialize)]
@@ -88,10 +108,14 @@ fn resize_scene(window: &WebviewWindow, state: &HitState, zoom: f64, scale: f64)
 }
 
 fn ground_offset(window: &WebviewWindow, state: &HitState) -> Result<i32, String> {
+    let scale = window.scale_factor().map_err(|e| e.to_string())?;
+    Ok(scaled_ground_offset(state, scale))
+}
+
+fn scaled_ground_offset(state: &HitState, scale: f64) -> i32 {
     let baseline = f64::from_bits(state.ground_baseline.load(Ordering::Relaxed));
     let zoom = f64::from_bits(state.zoom.load(Ordering::Relaxed));
-    let scale = window.scale_factor().map_err(|e| e.to_string())?;
-    Ok((baseline * zoom * scale).round() as i32)
+    (baseline * zoom * scale).round() as i32
 }
 
 fn dock_to_taskbar(window: &WebviewWindow, state: &HitState) -> Result<(), String> {
@@ -104,9 +128,10 @@ fn dock_to_taskbar(window: &WebviewWindow, state: &HitState) -> Result<(), Strin
             work.position.x + (work.size.width as i32 - size.width as i32).max(0),
         );
         let y = work.position.y + (work.size.height as i32 - ground_offset(window, state)?).max(0);
-        window
-            .set_position(tauri::PhysicalPosition::new(x, y))
-            .map_err(|e| e.to_string())?;
+        let docked = tauri::PhysicalPosition::new(x, y);
+        if position != docked {
+            window.set_position(docked).map_err(|e| e.to_string())?;
+        }
     }
     Ok(())
 }
@@ -117,7 +142,7 @@ fn window_placement(window: &WebviewWindow, state: &HitState) -> Option<WindowPl
     let position = window.outer_position().ok()?;
     let scale = monitor.scale_factor();
     Some(WindowPlacement {
-        monitor: monitor.name()?.clone(),
+        monitor: monitor_identifier(&monitor)?,
         x: f64::from(position.x - origin.x) / scale,
         y: f64::from(position.y - origin.y) / scale,
         docked: state.docked.load(Ordering::Relaxed),
@@ -125,16 +150,19 @@ fn window_placement(window: &WebviewWindow, state: &HitState) -> Option<WindowPl
 }
 
 #[tauri::command]
-fn begin_drag(state: State<'_, Arc<HitState>>) {
+fn begin_drag(state: State<'_, Arc<HitState>>) -> Result<(), String> {
+    let mut pending = state.pending_placement.lock().map_err(|e| e.to_string())?;
     state.dragging.store(true, Ordering::Relaxed);
     state.docked.store(false, Ordering::Relaxed);
+    *pending = None;
+    Ok(())
 }
 
 #[tauri::command]
 fn finish_drag(
     window: WebviewWindow,
     state: State<'_, Arc<HitState>>,
-) -> Result<Option<WindowPlacement>, String> {
+) -> Result<(), String> {
     state.dragging.store(false, Ordering::Relaxed);
     if let Some(monitor) = window.current_monitor().map_err(|e| e.to_string())? {
         let work = monitor.work_area();
@@ -147,7 +175,10 @@ fn finish_drag(
         }
         state.docked.store(near_bottom, Ordering::Relaxed);
     }
-    Ok(window_placement(&window, &state))
+    if let Some(placement) = window_placement(&window, &state) {
+        placement.save(&window)?;
+    }
+    Ok(())
 }
 
 fn replace_mask(state: &HitState, rows: Vec<Vec<[u16; 2]>>) -> Result<(), String> {
@@ -188,7 +219,7 @@ fn set_cursor_passthrough(
 }
 
 fn apply_zoom(window: &WebviewWindow, state: &HitState, zoom: f64) -> Result<(), String> {
-    validate_zoom(zoom)?;
+    validate_zoom(window, zoom)?;
     let old_origin = window.inner_position().map_err(|e| e.to_string())?;
     let old_size = window.outer_size().map_err(|e| e.to_string())?;
     let old_ground_y = old_origin.y + ground_offset(window, state)?;
@@ -227,35 +258,85 @@ fn set_zoom(
     window: WebviewWindow,
     state: State<'_, Arc<HitState>>,
     zoom: f64,
-) -> Result<Option<WindowPlacement>, String> {
+) -> Result<Option<String>, String> {
+    let pending = state.pending_placement.lock().map_err(|e| e.to_string())?;
     apply_zoom(&window, &state, zoom)?;
-    Ok(window_placement(&window, &state))
+    if pending.is_none() {
+        if let Some(placement) = window_placement(&window, &state) {
+            return Ok(placement.save(&window).err());
+        }
+    }
+    Ok(None)
+}
+
+fn monitor_identifier(monitor: &Monitor) -> Option<String> {
+    let name = monitor.name()?;
+    #[cfg(target_os = "windows")]
+    if let Some(id) = monitor::device_interface(name) {
+        return Some(id);
+    }
+    Some(name.clone())
+}
+
+fn find_saved_monitor(
+    window: &WebviewWindow,
+    saved: &WindowPlacement,
+) -> tauri::Result<Option<Monitor>> {
+    Ok(window.available_monitors()?.into_iter().find(|monitor| {
+        // Older versions saved the current display number instead of the device interface.
+        monitor.name() == Some(&saved.monitor)
+            || monitor_identifier(monitor).is_some_and(|id| id.eq_ignore_ascii_case(&saved.monitor))
+    }))
 }
 
 fn restore_window_placement(
     window: &WebviewWindow,
     state: &HitState,
     zoom: f64,
-    placement: Option<WindowPlacement>,
+    legacy: Option<WindowPlacement>,
 ) -> Result<(), String> {
-    validate_zoom(zoom)?;
-    let saved_monitor = placement.as_ref().and_then(|saved| {
-        window
-            .available_monitors()
-            .ok()?
-            .into_iter()
-            .find(|monitor| monitor.name() == Some(&saved.monitor))
-    });
-    let (monitor, placement) = match saved_monitor {
-        Some(monitor) => (monitor, placement),
-        None => (
-            window
-                .primary_monitor()
-                .map_err(|e| e.to_string())?
-                .ok_or("Primary monitor is unavailable")?,
-            None,
-        ),
-    };
+    validate_zoom(window, zoom)?;
+    let saved = WindowPlacement::read(window);
+    let needs_migration = saved.is_none();
+    let mut placement = saved.or(legacy);
+    let mut pending = state.pending_placement.lock().map_err(|e| e.to_string())?;
+    if let Some(saved) = placement.as_mut() {
+        if let Some(monitor) = find_saved_monitor(window, saved).map_err(|e| e.to_string())? {
+            place_window(window, state, zoom, &monitor, Some(saved))?;
+            *pending = None;
+            save_restored_placement(window, saved, &monitor, needs_migration);
+            return Ok(());
+        }
+    }
+    let monitor = window
+        .primary_monitor()
+        .map_err(|e| e.to_string())?
+        .ok_or("Primary monitor is unavailable")?;
+    place_window(window, state, zoom, &monitor, None)?;
+    *pending = placement;
+    Ok(())
+}
+
+fn save_restored_placement(
+    window: &WebviewWindow,
+    placement: &mut WindowPlacement,
+    monitor: &Monitor,
+    needs_migration: bool,
+) {
+    let id = monitor_identifier(monitor).unwrap_or_else(|| placement.monitor.clone());
+    if needs_migration || placement.monitor != id {
+        placement.monitor = id;
+        let _ = placement.save(window);
+    }
+}
+
+fn place_window(
+    window: &WebviewWindow,
+    state: &HitState,
+    zoom: f64,
+    monitor: &Monitor,
+    placement: Option<&WindowPlacement>,
+) -> Result<(), String> {
     let work = monitor.work_area();
     let scale = monitor.scale_factor();
 
@@ -268,7 +349,7 @@ fn restore_window_placement(
     let size = window.outer_size().map_err(|e| e.to_string())?;
     let max_x = work.size.width.saturating_sub(size.width) as i32;
     let max_y = work.size.height.saturating_sub(size.height) as i32;
-    let docked_y = (work.size.height as i32 - ground_offset(window, state)?).max(0);
+    let docked_y = (work.size.height as i32 - scaled_ground_offset(state, scale)).max(0);
     let (x, y, docked) = match placement {
         Some(saved) => {
             let x = ((saved.x * scale).round() as i32).clamp(0, max_x);
@@ -279,7 +360,11 @@ fn restore_window_placement(
             };
             (x, y, saved.docked)
         }
-        None => ((max_x - (24.0 * scale).round() as i32).max(0), docked_y, true),
+        None => (
+            (max_x - (24.0 * scale).round() as i32).max(0),
+            docked_y,
+            true,
+        ),
     };
     window
         .set_position(tauri::PhysicalPosition::new(
@@ -288,6 +373,28 @@ fn restore_window_placement(
         ))
         .map_err(|e| e.to_string())?;
     state.docked.store(docked, Ordering::Relaxed);
+    Ok(())
+}
+
+#[cfg(target_os = "windows")]
+fn update_window_layout(window: &WebviewWindow, state: &HitState) -> Result<(), String> {
+    let mut pending = state.pending_placement.lock().map_err(|e| e.to_string())?;
+    if state.dragging.load(Ordering::Relaxed) || !window.is_visible().map_err(|e| e.to_string())? {
+        return Ok(());
+    }
+    if let Some(saved) = pending.as_mut() {
+        // At login Windows can report the primary display before a secondary display is ready.
+        if let Some(monitor) = find_saved_monitor(window, saved).map_err(|e| e.to_string())? {
+            let zoom = f64::from_bits(state.zoom.load(Ordering::Relaxed));
+            place_window(window, state, zoom, &monitor, Some(saved))?;
+            save_restored_placement(window, saved, &monitor, true);
+            *pending = None;
+            return Ok(());
+        }
+    }
+    if state.docked.load(Ordering::Relaxed) {
+        dock_to_taskbar(window, state)?;
+    }
     Ok(())
 }
 
@@ -440,7 +547,6 @@ fn cursor_guard(window: WebviewWindow, state: Arc<HitState>) {
     std::thread::spawn(move || {
         let mut next_layout_check = Instant::now();
         let mut next_fullscreen_check = Instant::now();
-        let mut last_work_area = None;
         loop {
             std::thread::sleep(Duration::from_millis(35));
             if !state.ready.load(Ordering::Relaxed) {
@@ -464,21 +570,11 @@ fn cursor_guard(window: WebviewWindow, state: Arc<HitState>) {
             }
             if now >= next_layout_check {
                 next_layout_check = now + Duration::from_secs(1);
-                if state.docked.load(Ordering::Relaxed) && !state.dragging.load(Ordering::Relaxed) {
-                    if let Ok(Some(monitor)) = window.current_monitor() {
-                        let work = monitor.work_area();
-                        let geometry = (
-                            work.position.x,
-                            work.position.y,
-                            work.size.width,
-                            work.size.height,
-                        );
-                        if last_work_area != Some(geometry) {
-                            let _ = dock_to_taskbar(&window, &state);
-                            last_work_area = Some(geometry);
-                        }
-                    }
-                }
+                let camp = window.clone();
+                let state = state.clone();
+                let _ = window.run_on_main_thread(move || {
+                    let _ = update_window_layout(&camp, &state);
+                });
             }
             // Never change input handling while Windows is tracking a pressed button/drag.
             if unsafe { GetAsyncKeyState(1) } < 0 {
@@ -543,6 +639,7 @@ fn main() {
         ground_baseline: AtomicU64::new(300.0f64.to_bits()),
         docked: AtomicBool::new(false),
         dragging: AtomicBool::new(false),
+        pending_placement: Mutex::new(None),
     });
     tauri::Builder::default()
         .manage(state.clone())
@@ -555,19 +652,21 @@ fn main() {
             set_zoom,
             begin_drag,
             finish_drag,
+            settings::load_time_pause,
+            settings::save_time_pause,
+            i18n::get_camp_locale,
             tray::set_tray_notice,
             tray::sync_tray,
             tray::toggle_camp_visibility,
             about::show_about,
-            about::open_fire_download
+            about::open_credit_link
         ])
         .setup(move |app| {
+            let window = app.get_webview_window("main").expect("main window");
+            i18n::setup(&window)?;
             tray::setup(app)?;
             #[cfg(target_os = "windows")]
-            cursor_guard(
-                app.get_webview_window("main").expect("main window"),
-                state.clone(),
-            );
+            cursor_guard(window, state.clone());
             Ok(())
         })
         .run(tauri::generate_context!())

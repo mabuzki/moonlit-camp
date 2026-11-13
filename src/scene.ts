@@ -2,6 +2,7 @@ import { SkyEdge } from "./sky-edge";
 import { WindTrees } from "./wind-trees";
 import { dayNightAt, celestialSprite, LightingLayer, lightingVariants, LIGHT_PHASES, ValleyFog, type DayNight, type LightPhase, type LightingRole } from "./day-night";
 import { TENT_VISUALS, TENT_IDS, type TentVisual, type TentId } from "./tent-schedule";
+import { t } from "./i18n";
 
 export type Rect = [number, number, number, number];
 export interface Layer {
@@ -69,7 +70,7 @@ export async function loadScene(): Promise<{
   images: Map<string, HTMLImageElement>;
 }> {
   const response = await fetch("./scene.json");
-  if (!response.ok) throw new Error("营地配置载入失败");
+  if (!response.ok) throw new Error(t("sceneConfigFailed"));
   const scene: Scene = await response.json();
   const images = new Map<string, HTMLImageElement>();
   await Promise.all(
@@ -88,7 +89,7 @@ export async function loadScene(): Promise<{
             images.set(file, image);
             resolve();
           };
-          image.onerror = () => reject(new Error("素材载入失败：" + file));
+          image.onerror = () => reject(new Error(t("assetLoadFailed", file)));
           image.src = new URL(file, document.baseURI).href;
         }),
     ),

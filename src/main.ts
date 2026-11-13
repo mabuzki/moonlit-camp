@@ -5,6 +5,7 @@ import { PhysicalPosition } from "@tauri-apps/api/dpi";
 import { CampRenderer, loadScene, type CampState } from "./scene";
 import { CampAudio } from "./audio";
 import { dayNightAt, CYCLE_MINUTES, DEFAULT_CYCLE_MINUTES } from "./day-night";
+import { currentLocale, formatNumber, initLocale, t, type MessageKey } from "./i18n";
 import "./style.css";
 
 const DAYTIME_TARGET_HOUR = 11;
@@ -13,9 +14,9 @@ const NIGHT_START_HOUR = 20.5;
 const DAY_NIGHT_TRANSITION_MS = 1800;
 const native = isTauri();
 const app = document.querySelector<HTMLDivElement>("#app")!;
-app.innerHTML = `<canvas id="camp" tabindex="0" aria-label="月下营地；拖动背景移动窗口，点击物件互动，双击篝火切换昼夜；右键系统托盘图标调整设置"></canvas>`;
+app.innerHTML = `<canvas id="camp" tabindex="0"></canvas>`;
 if (!native) {
-  app.insertAdjacentHTML("beforeend", `<div class="toast" role="status" aria-live="polite"></div><div class="loading">正在点燃营火…</div>`);
+  app.insertAdjacentHTML("beforeend", `<div class="toast" role="status" aria-live="polite"></div><div class="loading"></div>`);
 }
 const canvas = document.querySelector<HTMLCanvasElement>("#camp")!,
   toast = document.querySelector<HTMLElement>(".toast"),
@@ -33,7 +34,7 @@ interface WindowPlacement {
   docked: boolean;
 }
 const savedPlacement = saved.windowPlacement;
-let windowPlacement: WindowPlacement | null = typeof savedPlacement?.monitor === "string"
+const windowPlacement: WindowPlacement | null = typeof savedPlacement?.monitor === "string"
   && Number.isFinite(savedPlacement.x) && Number.isFinite(savedPlacement.y)
   && typeof savedPlacement.docked === "boolean" ? savedPlacement : null;
 const state: CampState = {
@@ -70,6 +71,7 @@ let dayNightTransition: { remainingPhase: number; remainingMs: number } | null =
 let fullscreenPausedAt: number | null = null;
 let dragCompletion = Promise.resolve();
 let trayNoticeQueue = Promise.resolve();
+let loadingMessage: MessageKey = "loading";
 const debug = {
   state,
   ready: false,
@@ -94,6 +96,18 @@ Object.assign(window, { __CAMP__: debug });
 function currentDayNight(time = state.timePausedAt ?? state.clock) {
   return dayNightAt(time, state.cycleMinutes, state.cycleOffset, state.tentSeed);
 }
+function pausedCycleOffset() {
+  if (state.timePausedAt === null) return null;
+  // Save elapsed game days independently of the animation clock and cycle speed.
+  return state.cycleOffset + state.timePausedAt / (state.cycleMinutes * 60_000);
+}
+async function restoreTimePause() {
+  const offset = native ? await invoke<number | null>("load_time_pause") : saved.pausedCycleOffset;
+  if (typeof offset === "number" && Number.isFinite(offset)) {
+    state.timePausedAt = 0;
+    state.cycleOffset = offset;
+  }
+}
 function setFullscreenPaused(paused: boolean) {
   const pausedAt = fullscreenPausedAt;
   if (paused === (pausedAt !== null)) return;
@@ -112,13 +126,14 @@ function startDayNightTransition() {
   const { gameHour } = currentDayNight();
   const toDaytime = gameHour < 6 || gameHour >= NIGHT_START_HOUR;
   const targetHour = toDaytime ? DAYTIME_TARGET_HOUR : NIGHTTIME_TARGET_HOUR;
-  const transitionLabel = toDaytime ? "天亮" : "入夜";
   if (fullscreenPausedAt !== null) {
-    message(`退出全屏后可加速${transitionLabel}`);
+    message(t(toDaytime ? "dayAfterFullscreen" : "nightAfterFullscreen"));
     return;
   }
   if (state.paused || state.timePausedAt !== null) {
-    message(`继续${state.paused ? "动画" : "时间"}后可加速${transitionLabel}`);
+    message(t(state.paused
+      ? (toDaytime ? "dayAfterAnimation" : "nightAfterAnimation")
+      : (toDaytime ? "dayAfterTime" : "nightAfterTime")));
     return;
   }
   const hoursAhead = (targetHour - gameHour + 24) % 24;
@@ -126,7 +141,7 @@ function startDayNightTransition() {
     remainingPhase: hoursAhead / 24,
     remainingMs: DAY_NIGHT_TRANSITION_MS,
   };
-  message(`正在加速${transitionLabel}…`);
+  message(t(toDaytime ? "advancingDay" : "advancingNight"));
 }
 function remainingEasedProgress(remainingMs: number) {
   const t = remainingMs / DAY_NIGHT_TRANSITION_MS;
@@ -159,6 +174,7 @@ function save() {
     frameDuration: state.frameDuration, passthrough, zoom: state.zoom,
     windowPlacement,
     cycleMinutes: state.cycleMinutes,
+    pausedCycleOffset: native ? undefined : pausedCycleOffset(),
     tentSeed: state.tentSeed,
   }));
 }
@@ -181,7 +197,8 @@ async function syncTray() {
 function message(text: string) {
   if (native) {
     // Click and double-click can both send a notice. Keep them in interaction order.
-    trayNoticeQueue = trayNoticeQueue.then(() => invoke<void>("set_tray_notice", { text })).catch(console.error);
+    const language = currentLocale();
+    trayNoticeQueue = trayNoticeQueue.then(() => invoke<void>("set_tray_notice", { text, language })).catch(console.error);
     return;
   }
   if (!toast) return;
@@ -210,55 +227,66 @@ async function performCommand(id: string) {
     const next = !state.pinned;
     if (native) await invoke("set_pinned", { pinned: next });
     state.pinned = next;
-    message(next ? "营地置顶已开启" : "已取消置顶");
+    message(t(next ? "pinOn" : "pinOff"));
   } else if (id === "sound") {
     const next = !state.muted;
     await audio.setEnabled(!next);
     state.muted = next;
-    message(next ? "声音已关闭" : "篝火声已开启");
+    message(t(next ? "soundOff" : "soundOn"));
   } else if (id === "pause") {
     state.paused = !state.paused;
     if (ready) renderer.draw(state);
-    message(state.paused ? "动画已暂停" : "动画已继续");
+    message(t(state.paused ? "animationPaused" : "animationResumed"));
   } else if (id === "pause-time") {
     if (state.timePausedAt === null) {
       state.timePausedAt = state.clock;
+      if (native) {
+        try {
+          await invoke("save_time_pause", { pausedCycleOffset: pausedCycleOffset() });
+        } catch (error) {
+          state.timePausedAt = null;
+          throw error;
+        }
+      }
     } else {
+      if (native) await invoke("save_time_pause", { pausedCycleOffset: null });
       // Exclude the paused interval without changing the game hour or daily routines.
       state.cycleOffset += (state.timePausedAt - state.clock) / (state.cycleMinutes * 60_000);
       state.timePausedAt = null;
     }
     if (ready) renderer.draw(state);
-    message(state.timePausedAt !== null ? "时间已暂停" : "时间已继续");
+    message(t(state.timePausedAt !== null ? "timePaused" : "timeResumed"));
   } else if (id === "steam") {
     state.steam = !state.steam;
-    message(state.steam ? "水壶蒸汽已开启" : "水壶蒸汽已关闭");
+    message(t(state.steam ? "steamOn" : "steamOff"));
   } else if (id === "passthrough") {
     const next = !passthrough;
     if (native) await invoke("set_cursor_passthrough", { enabled: next });
     passthrough = next;
-    message(next ? "空白处鼠标穿透已开启" : "空白处鼠标穿透已关闭");
+    message(t(next ? "passthroughOn" : "passthroughOff"));
   } else if (/^zoom-(70|80|90|100|110|120|130|140|150)$/.test(id)) {
     const zoom = Number(id.slice(5)) / 100;
+    let placementError: string | null = null;
     if (native) {
       await dragCompletion;
-      windowPlacement = await invoke<WindowPlacement | null>("set_zoom", { zoom }) ?? windowPlacement;
+      placementError = await invoke<string | null>("set_zoom", { zoom });
     }
     state.zoom = zoom;
     applyZoomStyle();
-    message(`场景缩放 ${Math.round(zoom * 100)}%`);
+    if (placementError) fail(placementError);
+    else message(`${t("zoom")} · ${t("percentage", formatNumber(zoom * 100))}`);
   } else if (/^speed-(70|80|90|100|110|120|130|140|150|160|170|180)$/.test(id)) {
     state.frameDuration = Number(id.slice(6));
-    message(`火焰节奏 ${(100 / state.frameDuration).toFixed(2)}×`);
+    message(`${t("speed")} · ${formatNumber(100 / state.frameDuration, 2)}×`);
   } else if (/^cycle-(20|30|45|60|90|120)$/.test(id)) {
     const minutes = Number(id.slice(6));
     // Preserve the simulated hour while changing how fast future real time advances it.
     state.cycleOffset += (state.timePausedAt ?? state.clock) / 60_000 * (1 / state.cycleMinutes - 1 / minutes);
     state.cycleMinutes = minutes;
     if (ready) renderer.draw(state);
-    message(`现实 ${minutes} 分钟 = 游戏一昼夜`);
+    message(t("cycleChanged", formatNumber(minutes)));
   } else {
-    throw new Error("未知营地操作");
+    throw new Error(t("unknownAction"));
   }
   save();
   await syncTray();
@@ -309,11 +337,7 @@ function moveDrag(session: DragSession, event: PointerEvent) {
 function finishDrag(session: DragSession) {
   dragCompletion = flushDrag(session).then(async () => {
     if (!native) return;
-    const placement = await invoke<WindowPlacement | null>("finish_drag");
-    if (placement) {
-      windowPlacement = placement;
-      save();
-    }
+    await invoke("finish_drag");
   }).catch(fail);
 }
 canvas.addEventListener("pointermove", (event) => {
@@ -374,22 +398,22 @@ canvas.addEventListener("pointerup", (event) => {
   if (target.hit === "kettle") {
     if (!fire.heat) {
       state.steamUntil = 0;
-      message("水已经凉了，傍晚再烧");
+      message(t("coldWater"));
       return;
     }
     state.steam = true;
     save();
     void syncTray().catch(fail);
     state.steamUntil = (fullscreenPausedAt ?? performance.now()) + 3000;
-    message("咕嘟——水开了");
+    message(t("boilingWater"));
   } else {
     if (!fire.flame) {
       state.fireUntil = 0;
-      message(fire.smoke ? "篝火还有余烟，双击可加速入夜" : "篝火正在休息，双击可加速入夜");
+      message(t(fire.smoke ? "fireSmoking" : "fireResting"));
       return;
     }
     state.fireUntil = (fullscreenPausedAt ?? performance.now()) + 2200;
-    message("火星轻轻升起");
+    message(t("sparks"));
   }
 });
 canvas.addEventListener("click", (event) => {
@@ -439,8 +463,16 @@ function loop(now: number) {
   updateDynamicMask();
   renderCount++;
 }
-loadScene()
+function renderLocale() {
+  document.title = t("appName");
+  canvas.setAttribute("aria-label", t("canvasLabel"));
+  if (loading?.isConnected) loading.textContent = t(loadingMessage);
+}
+initLocale(renderLocale)
+  .catch(console.error)
+  .then(loadScene)
   .then(async ({ scene, images }) => {
+    await restoreTimePause();
     renderer = new CampRenderer(canvas, scene, images);
     applyZoomStyle();
     if (saved.zoom !== state.zoom || saved.tentSeed !== state.tentSeed) save();
@@ -463,7 +495,8 @@ loadScene()
     }
   })
   .catch((error) => {
-    if (loading) loading.textContent = "营地载入失败，请重新启动";
+    loadingMessage = "loadingFailed";
+    renderLocale();
     fail(error);
   });
 requestAnimationFrame(loop);
